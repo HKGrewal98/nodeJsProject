@@ -25,6 +25,6 @@ restaurant_id : String
 
 
 module.exports = {
-    "restaurants" : mongoose.model('restaurants', RestaurantsSchema),
+    "restaurants" : mongoose.model('restaurants', RestaurantsSchema)
  
 }

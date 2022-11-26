@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 const databaseUrl = require('./databaseConfig/database').databaseUrl
 const resturant = require('./model/restaurantModel').restaurants
 const db = require('./model/databaseFunctions')
-const {app,express} = require('./ServerConfig/server')
+const {app} = require('./ServerConfig/server')
 const restaurantApp = require('./mainRoutes/restaurantRoutes')
 require('dotenv').config()
 const PORT  = process.env.PORT || 8000

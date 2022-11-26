@@ -28,7 +28,7 @@ function addNewRestaurant(data,res){
         newRes.name = data.name
         newRes.restaurant_id = data.restaurant_id
         newRes.grades = data.grades
-        console.log(data.grades)
+      
         newRes.save(function(err,result){
             if(err){
                 return res.status(400).json({error:err})
@@ -38,20 +38,21 @@ function addNewRestaurant(data,res){
 }
 
 
-function getAllRestaurants(page, perPage, borough,res){
+function getAllRestaurants(page, perPage,borough,res){
    var filter = {}
-   if(borough){
+   if(borough){ // if it is not null
     filter = {borough : borough}
    }
-
-   var startIndex = (page-1)*perPage
-   var endIndex = page*perPage
+            
+   var startIndex = (page-1)*perPage 
+   var endIndex = page*perPage 
   
    restaurantModel
    .find(filter)
-   .sort({restaurant_id:1})
+   .sort({restaurant_id:1}) // ASC 1 , DESC -1
    .exec()
    .then((result)=> {
+    
      if(result.length > startIndex && result.length > endIndex){
         result = result.slice(startIndex,endIndex)
      } else if(result.length > startIndex && result.length < endIndex){

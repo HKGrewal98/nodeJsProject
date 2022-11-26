@@ -58,10 +58,4 @@ app.delete('/:id',(req,res)=>{
     return db.deleteRestaurantById(req.params.id,res)
   })
   
-
-
-
-
-
-
 module.exports = app
