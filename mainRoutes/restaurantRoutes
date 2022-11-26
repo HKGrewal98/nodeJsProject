@@ -1,0 +1,67 @@
+const {express} = require('../ServerConfig/server')
+const db = require('../model/databaseFunctions')
+const {check,validationResult } = require('express-validator')
+const app = express.Router()
+const path = require('path')
+require('dotenv').config({path:path.join(__dirname,'../.env')})
+
+
+
+app.post('/',[
+check('borough').notEmpty().isString(),
+check('cuisine').notEmpty().isString(),
+check('name').notEmpty().isString(),
+check('restaurant_id').notEmpty().isString(),
+check('grades').notEmpty().isArray(),
+check('address').notEmpty().isObject(),
+],(req,res)=>{
+
+          const errors = validationResult(req) 
+          if(!errors.isEmpty()){
+            return res.status(400).json(errors.array())
+          }
+
+          return db.addNewRestaurant(req.body,res)          
+})
+
+app.put('/:id',(req,res)=>{
+
+        const errors = validationResult(req) 
+        if(!errors.isEmpty()){
+          return res.json(errors.array())
+        }
+      
+        return db.updateRestaurantById(req.params.id,req.body,res)
+    
+})
+
+
+app.get('/',(req,res)=>{
+  
+    var {page,pageSize,borough} = req.query
+    if(!page){
+        page=1
+    }
+    if(!pageSize){
+        pageSize=process.env.DEFAULT_PAGE_SIZE
+    }
+
+    return db.getAllRestaurants(page,pageSize,borough,res) 
+})
+
+
+app.get('/:id',(req,res)=>{
+  return db.getRestaurantById(req.params.id,res)
+})
+
+app.delete('/:id',(req,res)=>{
+    return db.deleteRestaurantById(req.params.id,res)
+  })
+  
+
+
+
+
+
+
+module.exports = app
