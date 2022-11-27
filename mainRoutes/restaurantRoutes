@@ -1,13 +1,104 @@
-const {express} = require('../ServerConfig/server')
+const {express,passport} = require('../ServerConfig/server')
 const db = require('../model/databaseFunctions')
 const {check,validationResult } = require('express-validator')
 const app = express.Router()
 const path = require('path')
+const jwt = require('jsonwebtoken')
 require('dotenv').config({path:path.join(__dirname,'../.env')})
+const initializePassport = require("../ServerConfig/passport")
+ initializePassport(passport)
 
 
+function authenticateToken(req,res,next){
+         
+   console.log("JWT ENABLED : " + process.env.ENABLE_JWT) 
+    if(process.env.ENABLE_JWT === 'false'){
+          return next()
+    }
 
-app.post('/',[
+     const token = req.headers['access_token']
+     const username = req.headers['username']
+    
+     if(token == null){
+      return res.status(401).json({status:"FAILURE",message:"Jwt Token missing in the request."})
+     }
+      
+      jwt.verify(token,process.env.ACCESS_TOKEN_SECRET,(err,user)=> {
+           if(err){
+            return res.status(403).json({status:"FAILURE",message:"Jwt Token is wrong or expired."})
+           }
+          
+           if(user.name != username){
+            return res.status(403).json({status:"FAILURE",message:"Jwt Token assigned to another user."})
+           }
+
+           req.user = user
+           next()
+      })
+
+}
+
+function checkAuthenticated(req,res,next){
+       if(req.isAuthenticated()){
+         return next()
+       }
+
+       res.redirect("/api/restaurants/login")
+}
+
+
+function checkNotAuthenticated(req,res,next){
+  if(req.isAuthenticated()){
+       return res.redirect("/api/restaurants")
+  }
+       next()
+}
+
+
+app.get('/',checkAuthenticated,(req,res)=>{
+  console.log("Session Information.")
+  console.log(req.user)
+  console.log("Session")
+  console.log(req.session)
+  res.render('index',{name:req.user.name})
+})
+
+app.get('/login',checkNotAuthenticated,(req,res)=>{
+  res.render('login')
+})
+
+app.post('/login',checkNotAuthenticated,passport.authenticate('local',{
+  successRedirect : '/api/restaurants',
+  failureRedirect : '/api/restaurants/login',
+  failureFlash : true
+}))   
+
+app.get('/register',checkNotAuthenticated,(req,res)=>{
+  res.render('register')
+})
+
+app.post('/register',checkNotAuthenticated,(req,res)=>{
+    db.saveUser(req.body,res)
+})
+
+
+app.delete('/logout',(req,res)=>{
+  req.logout(function(err) {
+    if (err) { return res.redirect("/api/restaurants") }
+    res.redirect("/api/restaurants/login")
+  })
+})
+
+
+app.post('/v1/login',(req,res)=>{
+  
+  const {username} = req.body
+  const accessToken = jwt.sign({name:username},process.env.ACCESS_TOKEN_SECRET,{expiresIn:process.env.JWT_EXPIRES_IN})
+  res.json({status:"SUCCESS",access_token:accessToken})  
+
+})
+
+app.post('/',[authenticateToken,checkAuthenticated],[
 check('borough').notEmpty().isString(),
 check('cuisine').notEmpty().isString(),
 check('name').notEmpty().isString(),
@@ -24,7 +115,7 @@ check('address').notEmpty().isObject(),
           return db.addNewRestaurant(req.body,res)          
 })
 
-app.put('/:id',(req,res)=>{
+app.put('/:id',[authenticateToken,checkAuthenticated],(req,res)=>{
 
         const errors = validationResult(req) 
         if(!errors.isEmpty()){
@@ -36,7 +127,7 @@ app.put('/:id',(req,res)=>{
 })
 
 
-app.get('/',(req,res)=>{
+app.get('/all',[authenticateToken,checkAuthenticated],(req,res)=>{
   
     var {page,pageSize,borough} = req.query
     if(!page){
@@ -50,12 +141,16 @@ app.get('/',(req,res)=>{
 })
 
 
-app.get('/:id',(req,res)=>{
+app.get('/:id',[authenticateToken,checkAuthenticated],(req,res)=>{
   return db.getRestaurantById(req.params.id,res)
 })
 
-app.delete('/:id',(req,res)=>{
+app.delete('/:id',[authenticateToken,checkAuthenticated],(req,res)=>{
     return db.deleteRestaurantById(req.params.id,res)
   })
+
+app.all('*',(req,res)=>{
+  res.status(404).json({message:"Sorry! This Endpoint does not exist."})
+})  
   
 module.exports = app

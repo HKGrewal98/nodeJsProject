@@ -1,0 +1,15 @@
+<h2>Login</h2>
+
+{{#if messages.error }}
+{{messages.error}}
+{{/if}}
+
+<form action="/api/restaurants/login" method="POST">
+  <label for="email">Email:</label>
+  <input type="email"  name="email" required><br>
+  <label for="password">Password:</label>
+  <input type="password"  name="password" required><br><br>
+  <input type="submit" value="Login">
+</form> 
+
+<a href="/api/restaurants/register">Register</a>

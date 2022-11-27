@@ -1,6 +1,8 @@
 const mongoose = require('mongoose');
 const databaseUrl = require('../databaseConfig/database').databaseUrl
 const restaurantModel = require('./restaurantModel').restaurants
+const userModel = require('./userModel').users
+const bcrypt = require('bcrypt')
 
 async function databaseConnection(){
     try {
@@ -17,6 +19,39 @@ async function databaseConnection(){
         console.log(err)
         return 0
     }
+}
+
+
+ function saveUser(data,res){
+   const user = new userModel
+
+   userModel.findOne({email:data.email},function(err,result){
+         if(err){
+            return res.render('error',{message:"Please Try Again later."})
+         }
+
+         if(result!=null){
+            return res.render('error',{message:"User with same emailId already exists."})
+         }
+
+         try{
+            const hashedPassword =  bcrypt.hashSync(data.password,10)
+            user.name = data.name
+            user.email = data.email
+            user.password = hashedPassword 
+            user.save(function(err,result){
+                if(err){
+                    console.log(err)
+                    return res.render('error')
+                }else{
+                    console.log(`User created with Id ${result._id}.`)
+                    return res.redirect("/api/restaurants/login")
+        }})
+        }catch(error){
+            console.log(err)
+            return res.render('error')
+        }
+   })
 }
 
 
@@ -112,4 +147,5 @@ restaurantModel
 
 
 module.exports = {databaseConnection,addNewRestaurant,updateRestaurantById,
-                 getAllRestaurants,deleteRestaurantById,getRestaurantById}
+                 getAllRestaurants,deleteRestaurantById,getRestaurantById,
+                 saveUser}
