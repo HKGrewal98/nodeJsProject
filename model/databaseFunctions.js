@@ -63,7 +63,7 @@ function addNewRestaurant(data,res){
         newRes.name = data.name
         newRes.restaurant_id = data.restaurant_id
         newRes.grades = data.grades
-      
+    
         newRes.save(function(err,result){
             if(err){
                 return res.status(400).json({error:err})
@@ -72,6 +72,19 @@ function addNewRestaurant(data,res){
     }})
 }
 
+function createMetaInfo(page, perPage,borough,maxPage){
+    var nextPage = page+1;
+    var previousPage = page-1;
+    nextPage = Math.min(nextPage,maxPage)
+    previousPage = Math.max(1,previousPage)
+    return {
+        endpoint : "/api/restaurants/all",
+        previous_page: previousPage,
+        next_page : nextPage,
+        per_page : perPage,
+        borough : borough
+    }
+}
 
 function getAllRestaurants(page, perPage,borough,res){
    var filter = {}
@@ -87,8 +100,8 @@ function getAllRestaurants(page, perPage,borough,res){
    .sort({restaurant_id:1}) // ASC 1 , DESC -1
    .exec()
    .then((result)=> {
-    
-     if(result.length > startIndex && result.length > endIndex){
+    const metaInfo = createMetaInfo(page,perPage,borough,Math.ceil((result.length/perPage)))
+     if(result.length > startIndex && result.length >= endIndex){
         result = result.slice(startIndex,endIndex)
      } else if(result.length > startIndex && result.length < endIndex){
         result = result.slice(startIndex,result.length)
