@@ -139,6 +139,9 @@ app.get('/all',[authenticateToken,checkAuthenticated],(req,res)=>{
     if(!borough || borough=='/'){
       borough=null
   }
+   
+    console.log("Page : " + page + " perPage : " + perPage + " borugh : "  + borough)
+  
     return db.getAllRestaurants(parseInt(page),parseInt(perPage),borough,res,null) 
 })
 

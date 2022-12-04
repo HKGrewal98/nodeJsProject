@@ -103,8 +103,10 @@ function getDefaultMetaInfo(){
 function getAllRestaurants(page, perPage,borough,res,msg){
    var filter = {}
    if(borough){ // if it is not null
-    filter = {borough : borough}
+    filter = {borough : new RegExp(borough,'i')}
    }
+
+   console.log(filter)
             
    var startIndex = (page-1)*perPage 
    var endIndex = page*perPage
