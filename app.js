@@ -6,7 +6,7 @@ const {app,express} = require('./ServerConfig/server')
 const restaurantApp = require('./mainRoutes/restaurantRoutes')
 const path = require('path')
 require('dotenv').config()
-const PORT  = process.env.PORT || 3000
+const PORT  =  3000
 
 
 async function serverUp(){

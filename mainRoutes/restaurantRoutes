@@ -11,8 +11,10 @@ const initializePassport = require("../ServerConfig/passport")
 
 function authenticateToken(req,res,next){
          
-   console.log("JWT ENABLED : " + process.env.ENABLE_JWT) 
-    if(process.env.ENABLE_JWT === 'false'){
+   //console.log("JWT ENABLED : " + process.env.ENABLE_JWT) 
+   let enabled = 'false'
+    if(enabled === 'false'){
+      console.log("JWT Disabled.")
           return next()
     }
 
@@ -134,7 +136,7 @@ app.get('/all',[authenticateToken,checkAuthenticated],(req,res)=>{
         page=1
     }
     if(!perPage || perPage=='/'){
-        perPage=process.env.DEFAULT_PAGE_SIZE
+        perPage=10
     }
     if(!borough || borough=='/'){
       borough=null

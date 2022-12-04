@@ -16,7 +16,7 @@ app.use(express.urlencoded({urlencoded : false}))
 app.use(flash())
 const thirty_minutes = 1000 * 60 * 30;
 app.use(session({
-    secret : process.env.SESSION_SECRET ,
+    secret : '478269814c199935d534702359a6330baf1113940da72d4b996e29062df1c2c5c04ccaf930329df14667afcb833acebd2a390836d6590311e56640e964f6ca4c' ,
     resave : false,
     saveUninitialized : false,
     cookie : {maxAge : thirty_minutes }
