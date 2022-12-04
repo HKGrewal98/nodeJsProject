@@ -1,15 +1,62 @@
-<h2>Login</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+ <link rel='stylesheet' href='/stylesheets/login.css'/>
+</head>
+<body>
+  
+</body>
+</html>
+<div class="login-wrap">
+	<div class="login-html">
+		<input id="tab-1" type="radio" name="tab" class="sign-in" checked><label for="tab-1" class="tab">Sign In</label>
+		<input id="tab-2" type="radio" name="tab" class="sign-up"><label for="tab-2" class="tab">Sign Up</label>
+		<div class="login-form">
+			<div class="sign-in-htm">
 
-{{#if messages.error }}
-{{messages.error}}
-{{/if}}
+        <form action="/api/restaurants/login" method="POST">
+				<div class="group">
+					<label for="email" class="label">Email</label>
+					<input id="email" name="email" class="input" required>
+				</div>
 
-<form action="/api/restaurants/login" method="POST">
-  <label for="email">Email:</label>
-  <input type="email"  name="email" required><br>
-  <label for="password">Password:</label>
-  <input type="password"  name="password" required><br><br>
-  <input type="submit" value="Login">
-</form> 
+				<div class="group">
+					<label for="password" class="label">Password</label>
+					<input type="password" class="input" name="password" required>
+				</div>
+        
+				<div class="group">
+					<input type="submit" class="button" value="Sign In">
+				</div>
+				{{#if messages.error }}
+				<div class="clr">{{messages.error}}</div>
+				{{/if}}
+        </form>
 
-<a href="/api/restaurants/register">Register</a>
+				<div class="hr"></div>
+			</div>
+			<div class="sign-up-htm">
+        <form action="/api/restaurants/register" method="POST">
+				<div class="group">
+					<label for="name" class="label">Name</label>
+					<input type="text" name="name" class="input" required>
+				</div>
+				<div class="group">
+					<label for="email" class="label">Email</label>
+					<input type="email" name="email" class="input" required>
+				</div>
+				<div class="group">
+					<label for="password" class="label">Password</label>
+					<input type="password" name="password" class="input" required>
+				</div>
+				<div class="group">
+					<input type="submit" class="button" value="Sign Up">
+				</div>
+        </form>
+				<div class="hr"></div>
+				<div class="foot-lnk">
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

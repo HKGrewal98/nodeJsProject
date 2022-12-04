@@ -1,14 +1,95 @@
-<form action={{previous}} method="GET">
-    <input type="hidden" name="page" value={{p_page}} />
+<!DOCTYPE html>
+<html lang="en">
+ <head>
+  {{!-- <h1> Restaurants </h1> --}}
+     <link rel='stylesheet' href='/stylesheets/style.css'/>
+</head>
+<body>
+
+<header>
+        <form method="GET" action="/api/restaurants/all">
+        <label for="page">Page:  </label> &emsp;
+        <input type="text" name="page" required>&emsp;
+        <label for="pageSize">Page Size: </label> &emsp;
+        <input type="text" name="perPage" required>&emsp;
+        <label for="borough">Borough: </label> &emsp;
+        <input type="text" name="borough">&emsp;
+        <input class="button" type="submit" value="Search">
+        </form>
+<nav>
+        <form action="/api/restaurants/logout?_method=DELETE" method="POST">
+        <button class="button__link" type="submit">Log Out</button>
+        </form>
+</nav>
+</header>
+
+<header>
+    <form class="prev" action={{endpoint}} method="GET">
+    <input type="hidden" name="page" value={{previous_page}} />
     <input type="hidden" name="perPage" value={{per_page}} />
     <input type="hidden" name="borough" value={{borough}} />
-    <input type="submit" value="Previous"/>
-</form>
+    <input class="button__link" type="submit" value="Previous"/>
+    </form>
 
-<form action={{next}} method="GET">
+    <form method="GET" action="/api/restaurants/search">
+    <label for="id">Search by Id:  </label> &emsp;
+    <input type="text" name="id" required>&emsp;
+    <input class="button" type="submit" value="Search">
+    </form>
+
+    <form method="POST" action="/api/restaurants/delete?_method=DELETE">
+    <label for="delete">Delete by Id: </label> &emsp;
+    <input type="text" name="id" required>&emsp;
+    <input class="button" type="submit" value="Delete">
+    {{#if msg}}
+    <div class="alert">
+    <span>{{msg}}</span>
+    
+    <span class="closebtn" onclick="this.parentElement.style.display='none';">&times;</span> 
+        <span class="fas fa-times"></span>
+    </div>
+    </div>
+    {{/if}}
+    </form>
+
+    <form class="next" action={{endpoint}} method="GET">
     <input type="hidden" name="page" value={{next_page}} />
     <input type="hidden" name="perPage" value={{per_page}} />
     <input type="hidden" name="borough" value={{borough}} />
-    <input type="submit" value="Next"/>
-</form>
+    <input class="button__link" type="submit" value="Next"/>
+    </form>
+</header>
 
+<table border="1">
+    <tr>
+    <th>Restaurant Name</th>
+    <th>Address</th>
+    <th>Borough</th>
+    <th>Cuisine</th>
+    <th>Grades</th>
+    <th>Restaurant ID</th>
+  </tr>
+  <tr>
+    {{#each data}} 
+    <td>{{this.name}}</td>
+    <td><B>Building No:</B> {{this.address.building}},<br>
+    <b>Coords: </b>{{this.address.coord}},<br>
+    <b>Street: </b>{{this.address.street}},<br>
+    <b>Zipcode: </b>{{this.address.zipcode}}</td>
+    <td>{{this.borough}}</td>
+    <td>{{this.cuisine}}</td>
+    <td>
+    {{#each this.grades as |value key|}} 
+    {{#with value}}
+    <b>Grade(</b>{{key}}<b>)- Date: </b>{{date}},
+    <b>Grade: </b>{{grade}},
+    <b>Score: </b>{{score}} <br>
+    {{/with}}
+    {{/each}} 
+    </td>
+    <td>{{this.restaurant_id}}</td>
+    </tr>
+{{/each}}
+</table>
+</body>
+</html>

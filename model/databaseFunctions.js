@@ -49,7 +49,7 @@ async function databaseConnection(){
         }})
         }catch(error){
             console.log(err)
-            return res.render('error')
+            return res.render('err')
         }
    })
 }
@@ -82,21 +82,35 @@ function createMetaInfo(page, perPage,borough,maxPage){
         previous_page: previousPage,
         next_page : nextPage,
         per_page : perPage,
-        borough : borough
+        borough : borough,
+        msg: null    
     }
 }
 
-function getAllRestaurants(page, perPage,borough,res){
+function getDefaultMetaInfo(){
+    return {
+        endpoint : "/api/restaurants/all",
+        previous_page: 1,
+        next_page : 2,
+        per_page : 10,
+        borough : null, 
+        msg: null    
+    }
+
+}
+
+
+function getAllRestaurants(page, perPage,borough,res,msg){
    var filter = {}
    if(borough){ // if it is not null
     filter = {borough : borough}
    }
             
    var startIndex = (page-1)*perPage 
-   var endIndex = page*perPage 
+   var endIndex = page*perPage
   
    restaurantModel
-   .find(filter)
+   .find(filter).lean()
    .sort({restaurant_id:1}) // ASC 1 , DESC -1
    .exec()
    .then((result)=> {
@@ -108,12 +122,14 @@ function getAllRestaurants(page, perPage,borough,res){
      }else {
         result = result.slice(0,perPage)
      }
-
-    return res.status(201).json(result)
+     metaInfo.msg=msg
+     metaInfo.data=result
+     
+    return res.render('allRestaurants',metaInfo)
    })
    .catch((err)=>{
     console.log(err)
-    return res.status(400).json(err)
+    return res.render('err')
    })
 }
 
@@ -124,9 +140,14 @@ function getRestaurantById(id,res){
             console.log(err)
             return res.status(400).json(err)
         }else{
-            return res.status(200).json(result) 
+            let record = []
+            const metaInfo = getDefaultMetaInfo()
+                record.push(result)
+
+            metaInfo.data=record
+            return res.render('allRestaurants',metaInfo)
         }
-    })
+    }).lean()
 }
 
 function updateRestaurantById(id,data,res){
@@ -138,7 +159,7 @@ function updateRestaurantById(id,data,res){
     })
     .catch((err)=>{
         console.log(err)
-        return res.status(400).json(err)
+        return res.render('err')
     })
 }
     
@@ -151,7 +172,7 @@ restaurantModel
         console.log(err)
         return res.status(400).json(err)
     }else{
-        return res.status(200).json({status:'SUCCESS',message:`Record Deleted with Id ${id}.`}) 
+        getAllRestaurants(1,10,null,res,"Deleted Successfully!")
     }
 })
 

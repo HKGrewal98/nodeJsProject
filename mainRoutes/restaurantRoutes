@@ -68,7 +68,7 @@ app.get('/login',checkNotAuthenticated,(req,res)=>{
 })
 
 app.post('/login',checkNotAuthenticated,passport.authenticate('local',{
-  successRedirect : '/api/restaurants',
+  successRedirect : '/api/restaurants/all',
   failureRedirect : '/api/restaurants/login',
   failureFlash : true
 }))   
@@ -134,22 +134,22 @@ app.get('/all',[authenticateToken,checkAuthenticated],(req,res)=>{
         page=1
     }
     if(!perPage || perPage=='/'){
-        pageSize=process.env.DEFAULT_PAGE_SIZE
+        perPage=process.env.DEFAULT_PAGE_SIZE
     }
     if(!borough || borough=='/'){
       borough=null
   }
-
-    return db.getAllRestaurants(parseInt(page),parseInt(perPage),borough,res) 
+    return db.getAllRestaurants(parseInt(page),parseInt(perPage),borough,res,null) 
 })
 
+app.get('/search',[authenticateToken,checkAuthenticated],(req,res)=>{
+    let {id} = req.query
+    return db.getRestaurantById(id,res)
+ })
 
-app.get('/:id',[authenticateToken,checkAuthenticated],(req,res)=>{
-  return db.getRestaurantById(req.params.id,res)
-})
-
-app.delete('/:id',[authenticateToken,checkAuthenticated],(req,res)=>{
-    return db.deleteRestaurantById(req.params.id,res)
+app.delete('/delete',[authenticateToken,checkAuthenticated],(req,res)=>{
+    let {id} = req.body
+    return db.deleteRestaurantById(id,res)
   })
 
 app.all('*',(req,res)=>{

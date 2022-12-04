@@ -26,4 +26,5 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(methodOverride('_method'))
 
+
 module.exports = {app,express,passport}
