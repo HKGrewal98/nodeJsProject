@@ -12,9 +12,10 @@ const PORT  = process.env.PORT || 3000
 async function serverUp(){
          const state = await db.databaseConnection()
          console.log("DB Connection State : " + state)
-         if(state==0){
-            process.exit(0)
-         }
+         console.log("ENV : " + process.env.DATABASE_URL)
+         // if(state==0){
+         //    process.exit(0)
+         // }
          app.use('/api/restaurants',restaurantApp)
          app.use(express.static(path.join(__dirname, 'public')))
          console.log("Path is : " + path.join(__dirname, 'public'))
